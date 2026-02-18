@@ -1,5 +1,5 @@
 use std::fs;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use crate::executor::CommandExecutor;
 use crate::history::{HistoryEntry, append_history};
@@ -461,7 +461,8 @@ pub fn execute_nmap_scan(
 
     // Parse Alive Hosts
     let content = fs::read_to_string(&host_file).unwrap_or_default();
-    let re = Regex::new(r"Nmap scan report for ([\w\.-]+)").unwrap();
+    static REPORT_RE: OnceLock<Regex> = OnceLock::new();
+    let re = REPORT_RE.get_or_init(|| Regex::new(r"Nmap scan report for ([\w\.-]+)").unwrap());
     let alive_hosts: Vec<String> = re
         .captures_iter(&content)
         .map(|cap| cap[1].to_string())
