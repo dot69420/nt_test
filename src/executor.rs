@@ -156,16 +156,14 @@ impl CommandExecutor for ShellExecutor {
         }
 
         if let Some(stdout) = child.stdout.take() {
-            let reader = BufReader::new(stdout);
-            for line in reader.lines() {
-                match line {
-                    Ok(l) => {
-                        on_stdout(&l);
-                        // Also print to real stdout for CLI feedback
-                        println!("{}", l);
-                    }
-                    Err(_) => break,
+            let mut reader = BufReader::new(stdout);
+            let mut line_buffer = String::new();
+            while let Ok(n) = reader.read_line(&mut line_buffer) {
+                if n == 0 {
+                    break;
                 }
+                on_stdout(line_buffer.trim_end_matches(['\r', '\n']));
+                line_buffer.clear();
             }
         }
 
@@ -351,15 +349,14 @@ impl CommandExecutor for DockerExecutor {
         }
 
         if let Some(stdout) = child.stdout.take() {
-            let reader = BufReader::new(stdout);
-            for line in reader.lines() {
-                match line {
-                    Ok(l) => {
-                        on_stdout(&l);
-                        println!("{}", l); // Passthrough to real term
-                    }
-                    Err(_) => break,
+            let mut reader = BufReader::new(stdout);
+            let mut line_buffer = String::new();
+            while let Ok(n) = reader.read_line(&mut line_buffer) {
+                if n == 0 {
+                    break;
                 }
+                on_stdout(line_buffer.trim_end_matches(['\r', '\n']));
+                line_buffer.clear();
             }
         }
 
