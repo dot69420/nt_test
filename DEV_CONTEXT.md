@@ -81,7 +81,31 @@ All long-running tasks are encapsulated as "Jobs".
 
 ---
 
-## 4. Coding Standards
+## 4. API Specification
+The REST API exposes core tool functionalities via `src/api.rs`.
+
+### Endpoints
+- **General Job Management:**
+    - `GET /jobs`: List all active/completed jobs.
+    - `GET /jobs/:id`: Get detailed status and output for a specific job.
+
+- **Scanning & Enum:**
+    - `POST /scan/nmap`: Triggers `nmap` scan. Payload: `NmapConfig`.
+    - `POST /scan/web`: Triggers `gobuster`. Payload: `WebConfig`.
+    - `POST /scan/fuzz`: Triggers `ffuf`. Payload: `FuzzerConfig`.
+
+- **Exploitation:**
+    - `POST /exploit/search`: Triggers `searchsploit`. Payload: Query string.
+    - `POST /exploit/active`: Triggers active exploitation tools. Payload: `ExploitConfig`.
+    - `POST /exploit/brute`: Triggers `hydra`. Payload: `BruteConfig`.
+
+- **Network Operations:**
+    - `POST /netops/sniff`: Triggers `tcpdump`. Payload: Interface, Duration.
+    - `POST /netops/poison`: Triggers `responder`. Payload: Interface.
+
+---
+
+## 5. Coding Standards
 - **Error Handling:** Use `match` or `if let`. Avoid `unwrap()` on external inputs.
 - **Dependencies:** Use `CommandExecutor` trait for ANY system call. Use `IoHandler` for ANY printing/reading.
 - **Testing:**

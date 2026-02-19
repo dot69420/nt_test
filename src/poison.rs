@@ -2,27 +2,28 @@ use crate::executor::CommandExecutor;
 use crate::history::{HistoryEntry, append_history};
 use crate::io_handler::IoHandler;
 use chrono::Local;
+use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PoisonProfile {
     pub name: String,
     pub description: String,
-    pub flags: Vec<&'static str>,
+    pub flags: Vec<String>,
 }
 
 impl PoisonProfile {
-    pub fn new(name: &str, description: &str, flags: &[&'static str]) -> Self {
+    pub fn new(name: &str, description: &str, flags: &[&str]) -> Self {
         Self {
             name: name.to_string(),
             description: description.to_string(),
-            flags: flags.to_vec(),
+            flags: flags.iter().map(|s| s.to_string()).collect(),
         }
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PoisonConfig {
     pub interface: String,
     pub profile: PoisonProfile,
@@ -163,11 +164,11 @@ pub fn run_poisoning(
 pub fn build_responder_command(
     base_cmd: &str,
     interface: &str,
-    flags: &[&str],
+    flags: &[String],
     use_sudo: bool,
 ) -> (String, Vec<String>) {
     let mut args = vec!["-I".to_string(), interface.to_string()];
-    args.extend(flags.iter().map(|s| s.to_string()));
+    args.extend(flags.iter().cloned());
 
     let mut final_cmd = base_cmd.to_string();
     if use_sudo {

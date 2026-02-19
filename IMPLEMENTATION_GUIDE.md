@@ -102,7 +102,40 @@ The project relies on the following Rust crates:
 
 ---
 
-## 4. Building & Running
+## 4. API Implementation Plan
+The REST API in `src/api.rs` is expanded to cover all CLI capabilities.
+
+### 4.1. Web Fuzzing (`POST /scan/fuzz`)
+- **Request Body:** `FuzzerConfig` struct (target URL, wordlist path, flags).
+- **Validation:** URL format check, valid flags for `ffuf`.
+- **Logic:** Spawns a background job wrapping `fuzzer::execute_fuzzer`.
+
+### 4.2. Exploitation Endpoints
+- **`POST /exploit/search`**:
+    - **Input:** Search query string.
+    - **Logic:** Wraps `search_exploit::run_searchsploit`.
+- **`POST /exploit/active`**:
+    - **Input:** `ExploitConfig` (target, tool selection: sqlmap/curl).
+    - **Logic:** Wraps `exploit::execute_exploitation`.
+- **`POST /exploit/brute`**:
+    - **Input:** `BruteConfig` (target, service, username/password lists).
+    - **Logic:** Wraps `brute::run_brute_force`.
+
+### 4.3. Network Operations
+- **`POST /netops/sniff`**:
+    - **Input:** Interface name, capture duration.
+    - **Logic:** Wraps `sniffer::run_sniffer`.
+- **`POST /netops/poison`**:
+    - **Input:** Interface name.
+    - **Logic:** Wraps `poison::run_poisoning`.
+
+### 4.4. File Access
+- **`GET /storage/scans`**: Lists directories in `./scans`.
+- **`GET /storage/download/*path`**: Streams file content from `./scans`.
+
+---
+
+## 5. Building & Running
 
 ### Build
 ```bash

@@ -3,10 +3,11 @@ use crate::history::{HistoryEntry, append_history};
 use crate::io_handler::IoHandler;
 use chrono::Local;
 use colored::*;
+use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FuzzerConfig {
     pub target: String,
     pub wordlist: String,

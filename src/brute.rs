@@ -5,16 +5,17 @@ use crate::nmap;
 use crate::report;
 use chrono::Local;
 use colored::*;
+use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::{Path, PathBuf};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BruteProfile {
     pub name: String,
     pub description: String,
     pub userlist: String,
     pub passlist: String,
-    pub flags: Vec<&'static str>,
+    pub flags: Vec<String>,
 }
 
 impl BruteProfile {
@@ -23,19 +24,19 @@ impl BruteProfile {
         description: &str,
         userlist: &str,
         passlist: &str,
-        flags: &[&'static str],
+        flags: &[&str],
     ) -> Self {
         Self {
             name: name.to_string(),
             description: description.to_string(),
             userlist: userlist.to_string(),
             passlist: passlist.to_string(),
-            flags: flags.to_vec(),
+            flags: flags.iter().map(|s| s.to_string()).collect(),
         }
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BruteConfig {
     pub target: String,
     pub protocol: String,
@@ -518,7 +519,7 @@ fn find_wordlist(candidates: &[&str]) -> Option<String> {
 
 pub fn build_hydra_command(
     base_cmd: &str,
-    flags: &[&str],
+    flags: &[String],
     user_arg: &str,
     userlist: &str,
     pass_arg: &str,
@@ -529,7 +530,7 @@ pub fn build_hydra_command(
     port: &str,
     use_proxy: bool,
 ) -> (String, Vec<String>) {
-    let mut cmd_args: Vec<String> = flags.iter().map(|s| s.to_string()).collect();
+    let mut cmd_args: Vec<String> = flags.to_vec();
 
     cmd_args.push(user_arg.to_string());
     cmd_args.push(userlist.to_string());

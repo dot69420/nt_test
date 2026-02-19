@@ -4,30 +4,31 @@ use crate::io_handler::IoHandler;
 use chrono::Local;
 use colored::*;
 use regex::Regex;
+use serde::{Deserialize, Serialize};
 use std::fs::{self, File};
 use std::io::{BufRead, Write};
 use std::sync::OnceLock;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SniffProfile {
     pub name: String,
     pub description: String,
     pub filter: String, // tcpdump filter syntax
-    pub args: Vec<&'static str>,
+    pub args: Vec<String>,
 }
 
 impl SniffProfile {
-    pub fn new(name: &str, description: &str, filter: &str, args: &[&'static str]) -> Self {
+    pub fn new(name: &str, description: &str, filter: &str, args: &[&str]) -> Self {
         Self {
             name: name.to_string(),
             description: description.to_string(),
             filter: filter.to_string(),
-            args: args.to_vec(),
+            args: args.iter().map(|s| s.to_string()).collect(),
         }
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SnifferConfig {
     pub interface: String,
     pub profile: SniffProfile,
@@ -211,11 +212,11 @@ pub fn execute_sniffer(
 
         // Ensure -l (buffered) and -A (ascii) are present for live parsing
         let mut args = config.profile.args.clone();
-        if !args.contains(&"-l") {
-            args.push("-l");
+        if !args.contains(&"-l".to_string()) {
+            args.push("-l".to_string());
         }
-        if !args.contains(&"-A") {
-            args.push("-A");
+        if !args.contains(&"-A".to_string()) {
+            args.push("-A".to_string());
         } // Force ASCII for live view
 
         let (tcpdump_cmd, tcpdump_args) = build_sniffer_command(
@@ -453,11 +454,11 @@ fn extract_readable(payload: &str) -> String {
 pub fn build_sniffer_command(
     base_cmd: &str,
     interface: &str,
-    args: &[&str],
+    args: &[String],
     filter: &str,
     use_sudo: bool,
 ) -> (String, Vec<String>) {
-    let mut final_args: Vec<String> = args.iter().map(|s| s.to_string()).collect();
+    let mut final_args: Vec<String> = args.to_vec();
     final_args.push("-i".to_string());
     final_args.push(interface.to_string());
 

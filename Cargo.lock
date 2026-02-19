@@ -674,7 +674,7 @@ dependencies = [
 
 [[package]]
 name = "purpl"
-version = "0.1.0"
+version = "2.6.0"
 dependencies = [
  "axum",
  "chrono",

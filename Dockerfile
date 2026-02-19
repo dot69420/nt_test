@@ -12,6 +12,15 @@ RUN apt-get update && apt-get install -y \
     tcpdump \
     ffuf \
     responder \
+    sqlmap \
+    wifite \
+    aircrack-ng \
+    wireless-tools \
+    pciutils \
+    bluez \
+    bluez-tools \
+    seclists \
+    wordlists \
     iputils-ping \
     git \
     curl \
