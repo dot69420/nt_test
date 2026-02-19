@@ -753,9 +753,6 @@ fn show_submenu(
                 job_manager.clone(),
                 input,
             );
-            io.print("\nPress Enter to return to menu...");
-            io.flush();
-            let _ = io.read_line();
         }
     }
 }

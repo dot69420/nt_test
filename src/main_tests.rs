@@ -141,7 +141,6 @@ mod tests {
         io.add_input("n\n"); // Background: No (NEW ORDER)
         io.add_input("2\n"); // Profile: Quick
         io.add_input("\n"); // Return to submenu
-        io.add_input("\n"); // EXTRA
         io.add_input("0\n"); // Back to Main Menu
 
         // 2. Web Arsenal (Option 2) -> Gobuster (Option 1)
@@ -151,7 +150,6 @@ mod tests {
         io.add_input("n\n"); // Background: No (NEW POSITION)
         io.add_input("1\n"); // Profile 1: Quick Scan
         io.add_input("\n"); // Press Enter to return
-        io.add_input("\n"); // EXTRA
         io.add_input("0\n"); // Back to Main Menu
 
         // 3. Network Ops (Option 4) -> Sniffer (Option 1 - Core Standard)
@@ -161,7 +159,6 @@ mod tests {
         io.add_input("eth0\n"); // Interface Input
         io.add_input("n\n"); // Background: No
         io.add_input("\n"); // Press Enter to return
-        io.add_input("\n"); // EXTRA
         io.add_input("0\n"); // Back to Main Menu
 
         // 4. Exit (Option 0)

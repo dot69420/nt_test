@@ -18,18 +18,23 @@ This document provides a comprehensive guide to the architecture, implementation
 purpl/
 ├── src/
 │   ├── main.rs       # Entry point, interactive loop, and dependency wiring
-│   ├── executor.rs   # Command execution abstraction (Shell vs Mock)
-│   ├── io_handler.rs # Input/Output abstraction (Real vs Mock)
+│   ├── executor.rs   # Command execution abstraction (Shell, Docker, Mock)
+│   ├── io_handler.rs # Input/Output abstraction (Real, Mock, Capturing)
+│   ├── job_manager.rs # Thread management and job tracking
 │   ├── nmap.rs       # Nmap execution logic & profiles
 │   ├── web.rs        # Web Enumeration (Gobuster)
-│   ├── exploit.rs    # Exploit Search (Searchsploit)
+│   ├── fuzzer.rs     # Web Fuzzing (Ffuf)
+│   ├── exploit.rs    # Active Exploitation (SQLMap, Curl)
+│   ├── search_exploit.rs # Searchsploit logic
 │   ├── brute.rs      # Credential Access (Hydra)
 │   ├── poison.rs     # LAN Poisoning (Responder)
 │   ├── wifi.rs       # Wifite execution logic & profiles
 │   ├── bluetooth.rs  # Bluetooth Discovery & Attacks
 │   ├── sniffer.rs    # Tcpdump logic with live stream parsing
 │   ├── report.rs     # Report parsing (XML, JSON, TXT) & display
-│   └── history.rs    # History tracking (JSON based)
+│   ├── history.rs    # History tracking (JSON based)
+│   ├── api.rs        # REST API Server
+│   └── dashboard.rs  # Terminal UI for job monitoring
 ├── scans/            # Output directory
 │   ├── <target_ip>/  # For Nmap scans
 │   ├── web/          # For Gobuster results
@@ -54,54 +59,46 @@ The project relies on the following Rust crates:
 - `roxmltree`: Lightweight XML parsing for Nmap results.
 - `chrono`: Date and time formatting.
 - `libc`: System calls (checking root privileges in RealExecutor).
+- `axum` & `tokio`: For the REST API server and async runtime.
 
 ---
 
-## 3. Step-by-Step Implementation Guide
+## 3. Implemented Modules
 
 ### Phase 1: Foundation & Network Recon (`nmap.rs`)
 *   **Tool:** `nmap`
 *   **Profiles:** "Stealth", "Intense", "Mass Scan".
-*   **Logic:** Uses `execute_silent` for Deep Scan to avoid interfering with progress bars.
+*   **Logic:** Uses `execute_streamed` for real-time output capture.
 *   **Output:** `scans/<target>/<date>/`.
 
-### Phase 2: Web Enumeration (`web.rs`)
-*   **Tool:** `gobuster`
+### Phase 2: Web Arsenal (`web.rs`, `fuzzer.rs`)
+*   **Tools:** `gobuster`, `ffuf`.
 *   **Logic:** Validates URL, auto-detects wordlists, profiles.
-*   **Output:** `scans/web/<target>/<date>/gobuster.txt`.
+*   **Output:** `scans/web/<target>/<date>/`.
 
-### Phase 3: Exploit Search (`exploit.rs`)
-*   **Tool:** `searchsploit`
-*   **Logic:** Parses Nmap XML, queries Exploit-DB via `execute_output`.
-*   **Output:** Terminal display.
+### Phase 3: Exploitation Hub (`search_exploit.rs`, `exploit.rs`, `brute.rs`)
+*   **Tools:** `searchsploit`, `sqlmap`, `curl`, `hydra`.
+*   **Logic:** Parses Nmap XML for auto-correlation, interactive request builder for Curl.
+*   **Output:** Terminal display and `scans/exploit/`.
 
-### Phase 4: Credential Access (`brute.rs`)
-*   **Tool:** `hydra`
-*   **Logic:** Protocol selection, wordlist management.
-*   **Output:** `scans/brute/<target>/<date>/hydra.txt`.
+### Phase 4: Network Operations (`poison.rs`, `sniffer.rs`)
+*   **Tools:** `responder`, `tcpdump`.
+*   **Logic:**
+    - **Responder:** Requires Root. Moves logs after execution.
+    - **Tcpdump:** Live stream parsing (Source, Dest, Proto) or Passive capture (.pcap).
+*   **Output:** `scans/poison/` and `scans/packets/`.
 
-### Phase 5: LAN Poisoning (`poison.rs`)
-*   **Tool:** `responder`
-*   **Logic:** Requires Root (checked via `executor.is_root()`). Moves logs after execution.
-*   **Output:** `scans/poison/<date>/logs/`.
+### Phase 5: Wireless & RF (`wifi.rs`, `bluetooth.rs`)
+*   **Tools:** `wifite`, `bluez-utils`.
+*   **Logic:**
+    - **Wifite:** Automates `airmon-ng` setup/teardown. Requires hardware access (local execution preferred).
+    - **Bluetooth:** Discovery (`hcitool`), Enumeration (`sdptool`), Stress (`l2ping`).
+*   **Output:** `scans/wifi/` and `scans/bluetooth/`.
 
-### Phase 6: WiFi Automation (`wifi.rs`)
-*   **Tool:** `wifite`
-*   **Logic:** Automates `airmon-ng` setup/teardown. Requires Root.
-*   **Output:** `scans/wifi/<date>/cracked.json`.
-
-### Phase 7: Bluetooth Arsenal (`bluetooth.rs`)
-*   **Tools:** `BlueZ` suite.
-*   **Logic:** Discovery and attacks.
-*   **Output:** `scans/bluetooth/<date>/scan.txt`.
-
-### Phase 8: Packet Sniffer (`sniffer.rs`)
-*   **Tool:** `tcpdump`
-*   **Logic:** Uses `spawn_stdout` to stream and parse output in real-time without blocking.
-*   **Output:** `scans/packets/<date>/report.txt` and `capture.pcap`.
-
-### Phase 9: Unified Reporting (`report.rs`)
-*   **Logic:** Centralized parser using `IoHandler` for output.
+### Phase 6: Core Infrastructure (`job_manager.rs`, `api.rs`)
+*   **Job Manager:** Handles threaded execution, cancellation, and output buffering.
+*   **API Server:** Exposes functionality via HTTP endpoints.
+*   **Docker:** Abstracted execution via `DockerExecutor`.
 
 ---
 

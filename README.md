@@ -1,55 +1,70 @@
-# purpl (Network Test Control Center)
+# purpl (Purple Team Helper Tool)
 
-A powerful, interactive, and automated CLI tool for Red Teaming and Network Security auditing, written in Rust. purpl acts as a central control proxy, orchestrating industry-standard tools like Nmap and Wifite into a streamlined, safe, and efficient workflow.
+A powerful, interactive, and automated CLI tool for Red Teaming and Network Security auditing, written in Rust. `purpl` acts as a central control proxy, orchestrating industry-standard tools like Nmap, Gobuster, and Wifite into a streamlined, safe, and efficient workflow.
 
 ## Key Features
 
-*   **Multi-Tool Automation:**
-    *   **Nmap:** Automated scanning profiles (Stealth, Quick, Intense, Paranoid) with intelligent optimization for large networks (Class A/B).
-    *   **Wifite:** Automated WiFi auditing wrapper with monitor mode handling and cleanup.
-    *   **Tcpdump:** Integrated packet sniffing with real-time traffic analysis and reporting.
+*   **Multi-Tool Orchestration:**
+    *   **Nmap:** Automated scanning profiles (Stealth, Quick, Intense, Paranoid) with intelligent optimization for large networks.
+    *   **Wifite:** Automated WiFi auditing wrapper with monitor mode handling.
+    *   **Tcpdump:** Integrated packet sniffing with real-time analysis.
+    *   **Web Arsenal:** Gobuster for enumeration and Ffuf for fuzzing.
+    *   **Exploitation Hub:** Searchsploit integration and active exploitation tools (SQLMap, Hydra).
+    *   **Network Ops:** LAN Poisoning (Responder) and Bluetooth attacks.
+*   **Job Management:**
+    *   **"Always a Job":** Every task is a managed job that can run in the foreground or background.
+    *   **Dashboard:** Monitor active jobs and view historical results in a unified interface.
+*   **Container Support:**
+    *   **Docker Integration:** Run tools inside a Docker container for isolation and portability (`--container`).
+    *   **Hybrid Execution:** Automatically switch between local (hardware-dependent tools like Wifite) and containerized execution.
+*   **API Server:**
+    *   **REST API:** Expose `purpl` functionality via a REST API for remote control and integration (`purpl serve`).
 *   **Evasion and Anonymity:**
-    *   **Proxychains Integration:** Toggleable global proxy support to route all scans through Tor/SOCKS proxies for anonymity.
-    *   **Smart Privilege Handling:** Automatically detects root requirements. Allows standard users to run safe scans or safely elevates privileges (via sudo) only when necessary with secure validation.
+    *   **Proxychains Integration:** Global proxy support for all compatible tools.
+    *   **Smart Privilege Handling:** Automatically detects root requirements and handles `sudo` elevation securely.
 *   **Structured Reporting:**
-    *   Parses raw XML/JSON output into readable CLI reports.
-    *   Displays organized Host info: IPs (v4/v6), OS, MAC, and Service details.
-    *   Auto-generates Google Search links for discovered service versions to quickly find exploits.
+    *   Parses raw tool output (XML, JSON) into human-readable CLI reports.
+    *   Organized file structure: `scans/<tool>/<target>/<timestamp>/`.
 *   **History and Persistence:**
-    *   Automatically logs every scan execution (timestamp, target, mode, status).
-    *   View past scan reports interactively.
-*   **Optimization:**
-    *   **Class A Support:** Auto-detects large ranges (/8) and switches to optimized "Mass Scan" settings (no DNS, aggressive timing, rate-limited) to prevent timeouts.
-*   **Robust Architecture:**
-    *   **Testable Design:** Built with dependency injection to allow comprehensive unit testing without side effects.
-    *   **High Coverage:** Maintains >60% code coverage to ensure reliability.
+    *   Automatically logs every scan execution.
+    *   Smart input memory (remembers last target across tools).
 
 ## Dependencies
 
-Ensure the following tools are installed on your system:
+Ensure the following tools are installed on your system (or available in the Docker image):
 
 *   **Nmap:** Core network scanner.
-*   **Wifite:** WiFi auditing tool (requires Python).
-*   **Tshark (Wireshark-CLI):** Required by Wifite for packet analysis.
-*   **Airmon-ng / Aircrack-ng:** Required for WiFi monitor mode and cracking.
+*   **Gobuster / Ffuf:** Web enumeration and fuzzing.
+*   **Searchsploit:** Exploit database search.
+*   **Hydra / SQLMap:** Active exploitation.
+*   **Wifite / Airmon-ng:** WiFi auditing (requires hardware access).
+*   **Tcpdump / Responder:** Network sniffing and poisoning.
+*   **BlueZ Utils:** Bluetooth tools (`hcitool`, `l2ping`, etc.).
+*   **Docker:** (Optional) For containerized execution.
 
 ## Usage
 
 **Interactive Mode:**
 ```bash
-./purpl_bin
+./purpl
 ```
 
 **CLI One-Liners:**
 ```bash
-# Stealth scan a target (will prompt for sudo if needed)
-./purpl_bin --nmap 192.168.1.10
+# Stealth scan a target
+./purpl --nmap 192.168.1.10
 
 # Scan through Proxychains
-./purpl_bin --nmap 10.0.0.0/8 --proxy
+./purpl --nmap 10.0.0.0/8 --proxy
 
 # Run WiFi Audit
-./purpl_bin --wifite wlan0
+./purpl --wifite wlan0
+
+# Run in Docker Container
+./purpl --nmap 192.168.1.10 --container
+
+# Start API Server
+./purpl serve --port 3000
 ```
 
 ## Build
@@ -57,6 +72,7 @@ Ensure the following tools are installed on your system:
 ```bash
 cargo build --release
 ```
+The binary will be located at `target/release/purpl`.
 
 ## Testing
 
@@ -66,4 +82,14 @@ cargo test
 ```
 
 ## Roadmap
-Improve wifite implementation
+
+*   [x] Core Network Recon (Nmap)
+*   [x] Web Enumeration (Gobuster, Ffuf)
+*   [x] Exploitation Hub (Searchsploit, Hydra, SQLMap)
+*   [x] Network Ops (Sniffer, Poisoning)
+*   [x] Wireless & RF (WiFi, Bluetooth)
+*   [x] Job Manager & Dashboard
+*   [x] Docker Container Support
+*   [x] REST API Server
+*   [ ] Reporting Export (PDF/HTML)
+*   [ ] Plugin System for custom tools

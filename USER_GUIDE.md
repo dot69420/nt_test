@@ -11,7 +11,7 @@ PURPL offers both an interactive menu-driven interface for guided operations and
 To build and install PURPL, you will need a Rust toolchain.
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-repo/purpl.git # Replace with actual repo URL
+    git clone https://github.com/dot69420/purpl.git
     cd purpl
     ```
 2.  **Build the project:**
@@ -49,6 +49,8 @@ For automation, scripting, or quick one-off tasks, PURPL supports direct CLI inv
 *   `--proxy`: Route tool traffic through Proxychains (if configured on your system).
 *   `--args "<extra_tool_args>"`: Pass additional, tool-specific arguments directly.
 *   `--wordlist <path>`: Specify a custom wordlist for tools like Gobuster or Ffuf.
+*   `--container`: Run the specified tool inside a Docker container (default image: `purpl-tools`).
+*   `--image`: Specify a custom Docker image (e.g., `my-tools:latest`).
 
 **Example CLI Usage:**
 ```bash
@@ -57,6 +59,9 @@ For automation, scripting, or quick one-off tasks, PURPL supports direct CLI inv
 
 # Web enumeration with Gobuster
 ./target/release/purpl --web http://example.com --wordlist wordlists/common.txt
+
+# Run Web Fuzzing inside Docker
+./target/release/purpl --fuzz http://site.com/FUZZ --container
 
 # Active exploitation with SQLMap
 ./target/release/purpl --exploit http://site.com/vuln.php --tool sqlmap --args "--dbs --batch"
@@ -105,11 +110,6 @@ Comprehensive port scanning, service detection, OS fingerprinting, and vulnerabi
     3.  Choose a scan profile (e.g., `Stealth & Vuln`).
     4.  If prompted for `sudo` (and not already root), type `y` to elevate.
     5.  Decide whether to run in the background.
-*   **Usage Examples (CLI):**
-    ```bash
-    ./target/release/purpl --nmap 192.168.1.1 --args "-Pn -sV" # Nmap with args
-    ./target/release/purpl --nmap 192.168.1.1 --proxy # Nmap via proxychains
-    ```
 
 ### 5.2. Web Arsenal (Gobuster, Ffuf)
 
@@ -233,13 +233,35 @@ The Dashboard is your central hub for monitoring active jobs and reviewing past 
     *   `R`: Refresh the list.
     *   `0`: Return to the main menu.
 
-## 7. Troubleshooting & Tips
+## 7. API Server
+
+PURPL includes a built-in REST API server, allowing you to control tools remotely or integrate with other systems.
+
+### Starting the Server
+```bash
+./target/release/purpl serve --port 3000
+```
+This will start the server on `http://localhost:3000`.
+
+### Endpoints (Examples)
+*   **GET /status**: Check if the server is running.
+*   **POST /scan/nmap**: Start an Nmap scan.
+    ```json
+    {
+      "target": "192.168.1.10",
+      "profile": "Stealth & Vuln"
+    }
+    ```
+*   **GET /jobs**: List all active jobs.
+*   **GET /jobs/{id}**: Get details for a specific job.
+
+## 8. Troubleshooting & Tips
 
 *   **"Sudo authentication failed" errors:** If Nmap (or other tools requiring root) fails with this message, PURPL will now display the raw error output from `sudo`. This could indicate:
     *   Incorrect password.
     *   User is not in the `sudoers` file.
     *   `sudo` is not installed or configured correctly.
-*   **Missing Tools:** If PURPL reports that a tool (e.g., `sqlmap`, `ffuf`) is not found, ensure it's installed on your system and available in your `PATH`.
+*   **Missing Tools:** If PURPL reports that a tool (e.g., `sqlmap`, `ffuf`) is not found, ensure it's installed on your system or run with `--container` (if you have Docker setup).
 *   **Proxychains Issues:** Verify `proxychains` is installed and its configuration file (`/etc/proxychains.conf` or `~/.proxychains/proxychains.conf`) is correctly set up.
 *   **Networking:** Ensure your network interfaces are up and configured correctly, especially for sniffing and wireless auditing tools.
 *   **"Invalid selection" in menus:** Always enter the numeric or alphanumeric key exactly as displayed next to the menu option.

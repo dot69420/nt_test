@@ -34,6 +34,11 @@ pub fn validate_target(target: &str) -> Result<(), String> {
         return Err("Target contains illegal shell characters".to_string());
     }
 
+    // Check URLs first (they also contain '/')
+    if target.starts_with("http") && get_url_regex().is_match(target) {
+        return Ok(());
+    }
+
     // Allow CIDR for Nmap
     if target.contains('/') {
         let parts: Vec<&str> = target.split('/').collect();
@@ -50,11 +55,6 @@ pub fn validate_target(target: &str) -> Result<(), String> {
     }
 
     if get_ip_domain_regex().is_match(target) {
-        return Ok(());
-    }
-
-    // For web targets (URLs)
-    if target.starts_with("http") && get_url_regex().is_match(target) {
         return Ok(());
     }
 
