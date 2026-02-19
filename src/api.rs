@@ -56,10 +56,20 @@ pub async fn serve(
         executor,
     };
 
-    let app = Router::new()
+    let app = app(state);
+
+    let addr = format!("0.0.0.0:{}", port);
+    println!("Server listening on {}", addr);
+
+    let listener = TcpListener::bind(addr).await.unwrap();
+    axum::serve(listener, app).await.unwrap();
+}
+
+pub fn app(state: AppState) -> Router {
+    Router::new()
         .route("/health", get(health_check))
         .route("/jobs", get(list_jobs))
-        .route("/jobs/:id", get(get_job))
+        .route("/jobs/{id}", get(get_job))
         .route("/scan/nmap", post(trigger_nmap))
         .route("/scan/web", post(trigger_web))
         .route("/scan/fuzz", post(trigger_fuzz))
@@ -69,14 +79,8 @@ pub async fn serve(
         .route("/netops/sniff", post(trigger_netops_sniff))
         .route("/netops/poison", post(trigger_netops_poison))
         .route("/storage/scans", get(list_scans_files))
-        .route("/storage/download/*path", get(download_file))
-        .with_state(state);
-
-    let addr = format!("0.0.0.0:{}", port);
-    println!("Server listening on {}", addr);
-
-    let listener = TcpListener::bind(addr).await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+        .route("/storage/download/{*path}", get(download_file))
+        .with_state(state)
 }
 
 async fn health_check() -> &'static str {
@@ -422,3 +426,7 @@ async fn download_file(Path(path): Path<String>) -> impl IntoResponse {
         Err(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Failed to read file").into_response(),
     }
 }
+
+#[cfg(test)]
+#[path = "api_tests.rs"]
+mod api_tests;

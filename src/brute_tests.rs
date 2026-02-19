@@ -27,7 +27,7 @@ mod tests {
 
     #[test]
     fn test_build_hydra_command_basic() {
-        let flags = vec!["-t", "4"];
+        let flags = vec!["-t".to_string(), "4".to_string()];
         let (cmd, args) = build_hydra_command(
             "hydra",
             &flags,
@@ -51,7 +51,7 @@ mod tests {
 
     #[test]
     fn test_build_hydra_command_proxy() {
-        let flags = vec!["-v"];
+        let flags = vec!["-v".to_string()];
         let (cmd, args) = build_hydra_command(
             "hydra", &flags, "-l", "admin", "-P", "pass.txt", "out.txt", "10.0.0.1", "ftp", "",
             true,

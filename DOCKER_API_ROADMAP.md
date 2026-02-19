@@ -68,6 +68,8 @@ We need to clarify the "Purpl in Docker" vs "Purpl on Host" execution models, es
 | **Total** | | **~8 Hours** |
 
 ## 7. Next Steps
-1.  Review and approve this roadmap.
-2.  Begin with **Phase 1 (Docker Update)**.
-3.  Proceed to **Phase 2 (API Expansion)**.
+1.  [x] Review and approve this roadmap.
+2.  [x] Begin with **Phase 1 (Docker Update)**.
+3.  [x] Proceed to **Phase 2 (API Expansion)**.
+4.  [x] Proceed to **Phase 4 (Testing & Validation)**.
+5.  Proceed to update storage method (Phase 3 on hold).

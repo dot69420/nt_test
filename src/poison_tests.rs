@@ -65,7 +65,7 @@ fn test_run_poisoning_logic_sudo() {
 
 #[test]
 fn test_build_responder_command() {
-    let flags = vec!["-w", "-r"];
+    let flags = vec!["-w".to_string(), "-r".to_string()];
     let (cmd, args) = build_responder_command("responder", "eth0", &flags, false);
 
     assert_eq!(cmd, "responder");
@@ -74,7 +74,7 @@ fn test_build_responder_command() {
 
 #[test]
 fn test_build_responder_command_sudo() {
-    let flags = vec!["-w"];
+    let flags = vec!["-w".to_string()];
     let (cmd, args) = build_responder_command("responder", "eth0", &flags, true);
 
     assert_eq!(cmd, "sudo");

@@ -6,6 +6,8 @@ use std::thread;
 use std::time::Duration;
 
 #[cfg(test)]
+use std::collections::HashMap;
+#[cfg(test)]
 use std::io::Cursor;
 #[cfg(test)]
 use std::sync::Mutex;
@@ -464,9 +466,6 @@ impl CommandExecutor for HybridExecutor {
     }
 }
 
-#[cfg(test)]
-use std::collections::HashMap;
-
 // Mock for testing
 #[cfg(test)]
 #[derive(Clone)]
@@ -625,5 +624,26 @@ impl CommandExecutor for MockExecutor {
         _on_stdout: Box<dyn Fn(&str) + Send + Sync + '_>,
     ) -> io::Result<ExitStatus> {
         self.execute(program, args)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_docker_executor_build_args() {
+        let executor = DockerExecutor::new("purpl-tools");
+        let args = executor.build_args("nmap", &["-sV", "127.0.0.1"]);
+        
+        assert_eq!(args[0], "run");
+        assert!(args.contains(&"--rm".to_string()));
+        assert!(args.contains(&"--net=host".to_string()));
+        assert!(args.contains(&"purpl-tools".to_string()));
+        assert_eq!(args.last().unwrap(), "127.0.0.1");
+        
+        // Check if nmap is before the tool args
+        let nmap_idx = args.iter().position(|r| r == "nmap").unwrap();
+        assert_eq!(args[nmap_idx + 1], "-sV");
     }
 }

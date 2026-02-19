@@ -104,7 +104,7 @@ mod tests {
 
     #[test]
     fn test_build_sniffer_command_basic() {
-        let args = vec!["-v", "-A"];
+        let args = vec!["-v".to_string(), "-A".to_string()];
         let filter = "";
         let (cmd, args) = build_sniffer_command("tcpdump", "eth0", &args, filter, false);
 
@@ -115,7 +115,7 @@ mod tests {
 
     #[test]
     fn test_build_sniffer_command_filter() {
-        let args = vec!["-v"];
+        let args = vec!["-v".to_string()];
         let filter = "tcp port 80";
         let (cmd, args) = build_sniffer_command("tcpdump", "wlan0", &args, filter, false);
 
@@ -125,7 +125,7 @@ mod tests {
 
     #[test]
     fn test_build_sniffer_command_sudo() {
-        let args = vec!["-v"];
+        let args = vec!["-v".to_string()];
         let filter = "";
         let (cmd, args) = build_sniffer_command("tcpdump", "eth0", &args, filter, true);
 

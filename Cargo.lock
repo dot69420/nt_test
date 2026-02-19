@@ -681,13 +681,16 @@ dependencies = [
  "clap",
  "colored",
  "ctrlc",
+ "http-body-util",
  "indicatif",
  "libc",
+ "mime",
  "regex",
  "roxmltree",
  "serde",
  "serde_json",
  "tokio",
+ "tower",
 ]
 
 [[package]]
