@@ -402,13 +402,13 @@ pub fn print_wifite_report(entries: Vec<WifiteReport>, io: &dyn IoHandler) {
             entry.bssid,
             entry
                 .encryption
-                .clone()
-                .unwrap_or_else(|| "???".to_string())
+                .as_deref()
+                .unwrap_or("???")
                 .yellow(),
             entry
                 .key
-                .clone()
-                .unwrap_or_else(|| "N/A".to_string())
+                .as_deref()
+                .unwrap_or("N/A")
                 .red()
                 .bold()
         ));
