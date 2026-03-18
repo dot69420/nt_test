@@ -380,12 +380,17 @@ async fn trigger_netops_poison(
 }
 
 async fn list_scans_files() -> Json<Vec<String>> {
-    let root = StdPath::new("scans");
-    let mut files = Vec::new();
+    let files = tokio::task::spawn_blocking(move || {
+        let root = StdPath::new("scans");
+        let mut files = Vec::new();
 
-    if root.exists() {
-        visit_dirs(root, &mut files, root);
-    }
+        if root.exists() {
+            visit_dirs(root, &mut files, root);
+        }
+        files
+    })
+    .await
+    .unwrap_or_default();
 
     Json(files)
 }
