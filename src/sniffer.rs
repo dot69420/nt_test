@@ -71,7 +71,7 @@ pub fn configure_sniffer(
     }
 
     // 3. Select Filter Profile
-    let profiles = vec![
+    let mut profiles = vec![
         SniffProfile::new(
             "All Traffic",
             "Capture everything. Good for overview.",
@@ -118,13 +118,14 @@ pub fn configure_sniffer(
     io.flush();
     let input = io.read_line();
     let mut selected_profile = if let Ok(idx) = input.trim().parse::<usize>() {
-        if idx > 0 && idx <= profiles.len() {
-            profiles[idx - 1].clone()
+        let selected_idx = if idx > 0 && idx <= profiles.len() {
+            idx - 1
         } else {
-            profiles[0].clone()
-        }
+            0
+        };
+        profiles.remove(selected_idx)
     } else {
-        profiles[0].clone()
+        profiles.remove(0)
     };
 
     if selected_profile.name == "Custom Filter" {
@@ -211,7 +212,7 @@ pub fn execute_sniffer(
         io.println("[+] Live parsing... Press Ctrl+C to stop.");
 
         // Ensure -l (buffered) and -A (ascii) are present for live parsing
-        let mut args = config.profile.args.clone();
+        let mut args = config.profile.args;
         if !args.contains(&"-l".to_string()) {
             args.push("-l".to_string());
         }
@@ -346,7 +347,7 @@ fn select_interface(
         }
 
         if choice > 0 && choice <= interfaces.len() {
-            return Some(interfaces[choice - 1].clone());
+            return Some(interfaces.remove(choice - 1));
         }
     }
 
