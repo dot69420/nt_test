@@ -400,17 +400,8 @@ pub fn print_wifite_report(entries: Vec<WifiteReport>, io: &dyn IoHandler) {
             "{:<20} | {:<15} | {:<10} | {:<20}",
             entry.essid.green(),
             entry.bssid,
-            entry
-                .encryption
-                .as_deref()
-                .unwrap_or("???")
-                .yellow(),
-            entry
-                .key
-                .as_deref()
-                .unwrap_or("N/A")
-                .red()
-                .bold()
+            entry.encryption.as_deref().unwrap_or("???").yellow(),
+            entry.key.as_deref().unwrap_or("N/A").red().bold()
         ));
     }
 }
