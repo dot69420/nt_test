@@ -135,12 +135,12 @@ pub fn configure_web_enum(
 
     let mut selected_profile = if let Ok(idx) = input.trim().parse::<usize>() {
         if idx > 0 && idx <= profiles.len() {
-            profiles[idx - 1].clone()
+            profiles.into_iter().nth(idx - 1).unwrap()
         } else {
-            profiles[0].clone()
+            profiles.into_iter().next().unwrap()
         }
     } else {
-        profiles[0].clone()
+        profiles.into_iter().next().unwrap()
     };
 
     // Handle Manual Wordlist

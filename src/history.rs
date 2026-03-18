@@ -97,7 +97,9 @@ pub fn load_history_from_file(file_path: &str) -> io::Result<Vec<HistoryEntry>> 
         // Assume JSONL
         let mut history = Vec::new();
         for line in content.lines() {
-            if line.trim().is_empty() { continue; }
+            if line.trim().is_empty() {
+                continue;
+            }
             if let Ok(entry) = serde_json::from_str::<HistoryEntry>(line) {
                 history.push(entry);
             }
