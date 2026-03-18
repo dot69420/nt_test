@@ -82,12 +82,9 @@ fn collect_items(job_manager: &Arc<JobManager>) -> Vec<DashboardItem> {
 
     // 1. Active/Recent Jobs (Memory)
     let jobs = job_manager.list_jobs();
-    // Sort jobs by ID descending (newest first)
-    let mut sorted_jobs = jobs.clone();
-    sorted_jobs.sort_by_key(|j| j.id);
-    sorted_jobs.reverse();
-
-    for job in sorted_jobs {
+    // list_jobs() returns a Vec<Arc<Job>> already sorted by ID ascending (from BTreeMap).
+    // We iterate in reverse to process newest jobs first, avoiding unnecessary clone and sort.
+    for job in jobs.into_iter().rev() {
         let status_lock = job.status.lock().unwrap();
         let status_str = match *status_lock {
             JobStatus::Running => "RUNNING".yellow().bold().to_string(),
